@@ -8,6 +8,7 @@ import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.implicits._
 import cats.implicits._
 import cats.instances._
+import server.Server
 
 import scala.concurrent.ExecutionContext.global
 
@@ -17,25 +18,4 @@ object Main extends IOApp {
   }
 }
 
-object Server {
 
-  def stream[F[_]: ConcurrentEffect: Timer](): Stream[F, ExitCode] = {
-    val emojifierApp = Routes.route.orNotFound
-
-    for{
-      client <- BlazeClientBuilder[F](global).stream
-      exitCode <- BlazeServerBuilder[F]
-          .bindHttp(8080, "localhost")
-          .withHttpApp(emojifierApp)
-          .serve
-    } yield exitCode
-  }
-}
-
-object Routes {
-  def route[F[_]: Sync] = {
-    val dsl = new Http4sDsl[F] {}
-    import dsl._
-    HttpRoutes.of[F]{case GET -> Root => Sync[F].suspend(Ok("HelloWorld"))}
-  }
-}
