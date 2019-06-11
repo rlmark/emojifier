@@ -1,12 +1,16 @@
 package server
 
-import cats.effect.Sync
+import cats.Functor
+import cats.effect._
+import cats.syntax._
+import cats.instances._
+import cats.implicits._
 import models.EmojiRequest
 import org.http4s.{EntityDecoder, HttpRoutes}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.circe._
 
-object Routes {
+class Routes(dataClient: EmojiDataClient) {
   def healthCheck[F[_]: Sync] = {
     val dsl = new Http4sDsl[F] {}
     import dsl._
@@ -20,7 +24,13 @@ object Routes {
     HttpRoutes.of[F]{case req @ POST -> Root / "emojify" =>
       implicit val y: EntityDecoder[F, EmojiRequest] = jsonOf[F, EmojiRequest](Sync[F], emojiDecoder) //
       val emojiText: F[EmojiRequest] = req.as[EmojiRequest]
-      Ok("working on it")
+      val res: F[String] = for {
+        text <- emojiText
+      } yield dataClient.getEmoji(text.text)
+
+      println(res)
+
+      Ok(res)
     }
   }
 }

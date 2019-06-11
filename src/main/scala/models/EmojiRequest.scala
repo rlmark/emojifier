@@ -9,3 +9,8 @@ object EmojiRequest {
   implicit val emojiDecoder: Decoder[EmojiRequest] = deriveDecoder[EmojiRequest]
 }
 
+object test extends App {
+  import EmojiRequest._
+  val req = EmojiRequest("sdfkjs")
+  println(emojiEncoder.apply(req))
+}
