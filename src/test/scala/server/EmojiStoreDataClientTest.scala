@@ -5,7 +5,7 @@ import org.scalatest._
 class EmojiStoreDataClientTest extends FlatSpec with Matchers {
 
   "EmojiStoreDataClient" should "return an emoji representation of the string if valid" in {
-    val description = "smile"
+    val description = ":smile:"
     val client = new EmojiStoreDataClient
     client.getEmoji(description) shouldBe ":)"
   }
